@@ -19,17 +19,17 @@ export default function Home() {
     <div>
       <Head>
         <title>360° Image Viewer</title>
-        <meta name="description" content="360° Image Viewer - A-Frame" />
+        <meta name="description" content="FFyL 360°" />
       </Head>
 
       {/* Cargamos el script de A-Frame */}
       <Script src="https://aframe.io/releases/1.3.0/aframe.min.js" strategy="beforeInteractive" />
 
       {isClient ? (
-        <a-scene vr-mode-ui="enabled: false"> {/* Deshabilitamos el Cardboard UI */}
+        <a-scene vr-mode-ui="enabled: true" embedded> {/* Habilitar VR y modo inmersivo */}
           {/* Cámara con controles de vista para PC, móviles y VR */}
           <a-entity position="0 1.6 0">
-            <a-camera look-controls="enabled: true; touchEnabled: true">
+            <a-camera look-controls="enabled: true; touchEnabled: true; magicWindowTrackingEnabled: true" wasd-controls="enabled: false"> {/* Deshabilitar WASD en PC */}
               <a-cursor
                 raycaster="objects: .clickable"
                 fuse="true"
@@ -52,7 +52,7 @@ export default function Home() {
             text="value: Oficina; align: center"
             event-set__mouseenter="material.color: #7BC8A4"
             event-set__mouseleave="material.color: #333"
-            onclick={changeScene}  // Cambia la escena cuando se hace clic
+            onclick={changeScene}
           ></a-entity>
 
           {/* Luces para mejorar la visibilidad */}
