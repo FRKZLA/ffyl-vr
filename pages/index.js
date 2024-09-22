@@ -1,10 +1,29 @@
 import { useEffect, useState } from 'react';
 import Head from 'next/head';
 import Script from 'next/script';
+import fs from 'fs';
+import path from 'path';
 
-export default function Home() {
+export async function getStaticProps() {
+  // Cargar los archivos de texto
+  const infoAPath = path.join(process.cwd(), 'public/data/InfoA.txt');
+  const infoBPath = path.join(process.cwd(), 'public/data/InfoB.txt');
+  const infoAContent = fs.readFileSync(infoAPath, 'utf8');
+  const infoBContent = fs.readFileSync(infoBPath, 'utf8');
+
+  return {
+    props: {
+      infoAContent,
+      infoBContent
+    }
+  };
+}
+
+export default function Home({ infoAContent, infoBContent }) {
   const [isClient, setIsClient] = useState(false);
   const [isMobileOrVR, setIsMobileOrVR] = useState(false);
+  const [currentImage, setCurrentImage] = useState('/data/InfoA.png');
+  const [currentText, setCurrentText] = useState(infoAContent);
 
   useEffect(() => {
     setIsClient(true); // Esto asegura que el componente se renderice solo en el cliente
@@ -16,19 +35,33 @@ export default function Home() {
     } else {
       setIsMobileOrVR(false);
     }
-  }, []);
 
-  // Función para redirigir a la página de la oficina
-  const redirectToOffice = () => {
-    window.location.href = '/office';
-  };
+    // Añadir el evento de clic a los botones después de que A-Frame se cargue
+    if (window.AFRAME) {
+      const buttonA = document.querySelector('#buttonA');
+      const buttonB = document.querySelector('#buttonB');
+
+      if (buttonA) {
+        buttonA.addEventListener('click', () => {
+          setCurrentImage('/data/InfoA.png');
+          setCurrentText(infoAContent);
+        });
+      }
+
+      if (buttonB) {
+        buttonB.addEventListener('click', () => {
+          setCurrentImage('/data/InfoB.png');
+          setCurrentText(infoBContent);
+        });
+      }
+    }
+  }, [infoAContent, infoBContent]);
 
   return (
     <div>
       <Head>
         <title>FFyL 360°</title>
         <meta name="description" content="FFyL 360°" />
-        {/* Agregar estilos */}
         <style>{`
           html, body {
             margin: 0;
@@ -39,7 +72,7 @@ export default function Home() {
           #__next {
             height: 100%;
           }
-          .a-enter-vr-button {
+          .a-enter-vr-button a-enter-ar-button{
             position: fixed !important;
             bottom: 25px !important;
             right: 25px !important;
@@ -56,6 +89,7 @@ export default function Home() {
         `}</style>
       </Head>
 
+      {/* Cargamos el script de A-Frame */}
       <Script src="https://aframe.io/releases/1.3.0/aframe.min.js" strategy="beforeInteractive" />
 
       {isClient ? (
@@ -72,21 +106,32 @@ export default function Home() {
             </a-camera>
           </a-entity>
 
-          {/* Skybox con la imagen del pasillo */}
+          {/* Cargar las imágenes como assets */}
+          <a-assets>
+            <img id="infoA" src="/data/InfoA.png" crossorigin="anonymous" />
+            <img id="infoB" src="/data/InfoB.png" crossorigin="anonymous" />
+          </a-assets>
+
+          {/* Skybox con la imagen actual */}
           <a-sky src="/image/Hallway.jpg" rotation="0 0 0"></a-sky>
 
-          {/* Botón para navegar a la página de la Oficina */}
-          <a-entity
-            class="clickable"
-            geometry="primitive: plane; width: 1.5; height: 0.7" 
-            material="color: #333"
-            position="0 1.5 -3"  
-            text="value: Oficina; align: center; color: #FFF"
-            event-set__mouseenter="material.color: #7BC8A4"
-            event-set__mouseleave="material.color: #333"
-            event-set__click="material.color: #00FF00"
-            onclick={redirectToOffice}  // Usamos window.location.href para redirigir
-          ></a-entity>
+          {/* Botones interactivos */}
+          <a-entity id="ui" position="0 1.6 -2.5">
+            {/* Botón para InfoA */}
+            <a-entity id="buttonA" class="clickable" geometry="primitive: plane; width: 0.5; height: 0.5"
+              material="color: Blue" position="-0.75 0 0" text="value: Info A; align: center; color: Red">
+            </a-entity>
+
+            {/* Botón para InfoB */}
+            <a-entity id="buttonB" class="clickable" geometry="primitive: plane; width: 0.5; height: 0.5"
+              material="color: Yellow" position="0.75 0 0" text="value: Info B; align: center; color: Green">
+            </a-entity>
+          </a-entity>
+
+          {/* Panel de información para mostrar el texto correspondiente */}
+          <a-entity id="infoPanel" position="0 0 -2" geometry="primitive: plane; width: 1.5; height: 1.0"
+            material="color: #333" text={`value: ${currentText}; color: #FFF; wrapCount: 30;`}>
+          </a-entity>
 
         </a-scene>
       ) : (
