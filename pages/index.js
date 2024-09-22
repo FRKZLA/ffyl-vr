@@ -23,7 +23,7 @@ export default function Home() {
       </Head>
 
       {/* Cargamos el script de A-Frame */}
-      <Script src="https://aframe.io/releases/1.2.0/aframe.min.js" strategy="beforeInteractive" />
+      <Script src="../../../dist/aframe-master.js" strategy="beforeInteractive" />
 
       {isClient ? (
         <a-scene>
