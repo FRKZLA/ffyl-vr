@@ -2,25 +2,25 @@
     "areas": {
       "area1": {
         "image": "/image/Hallway.jpg",
-        "description": "Esta es el área 1, contiene esculturas importantes.",
+        "description": "Punto 1, contiene esculturas importantes.",
         "hasPanelImage": true,
         "panelImage": "/data/panel1.png"
       },
       "area2": {
         "image": "/image/Office.jpg",
-        "description": "Esta es el área 2, con pinturas de renombre.",
+        "description": "Punto 2, con pinturas de renombre.",
         "hasPanelImage": true,
         "panelImage": "/data/panel2.png"
       },
       "area3": {
         "image": "/image/Lab.jpg",
-        "description": "Esta es el área 2, con pinturas de renombre.",
-        "hasPanelImage": true,
+        "description": "Punto 3, con pinturas de renombre.",
+        "hasPanelImage": false,
         "panelImage": "/data/panel1.png"
       },
       "area4": {
         "image": "/image/Studio.jpg",
-        "description": "Esta es el área 2, con pinturas de renombre.",
+        "description": "Punto 4, con pinturas de renombre.",
         "hasPanelImage": true,
         "panelImage": "/data/panel2.png"
       }

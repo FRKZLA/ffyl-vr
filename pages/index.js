@@ -20,7 +20,7 @@ export async function getStaticProps() {
 export default function Home({ infoData }) {
   const [isClient, setIsClient] = useState(false);
   const [isMobileOrVR, setIsMobileOrVR] = useState(false);
-  const [currentArea, setCurrentArea] = useState('area1'); // Área inicial
+  const [currentArea, setCurrentArea] = useState('area2'); // Área inicial
   const [currentPanel, setCurrentPanel] = useState(null); // Panel inicial
 
   useEffect(() => {
@@ -55,6 +55,26 @@ export default function Home({ infoData }) {
           el.addEventListener('click', () => {
             setCurrentPanel(infoData.areas[currentArea]); // Cargar la información del panel actual
           });
+        }
+      });
+    }
+
+    // Registrar el componente para cerrar el panel cuando se aleje la vista
+    if (window.AFRAME && !AFRAME.components['close-on-look-away']) {
+      AFRAME.registerComponent('close-on-look-away', {
+        schema: {
+          distance: { type: 'number', default: 1 } // Distancia de cierre
+        },
+        tick: function () {
+          const cameraEl = document.querySelector('[camera]');
+          const cameraPos = cameraEl.object3D.position;
+          const elPos = this.el.object3D.position;
+          const distance = cameraPos.distanceTo(elPos);
+
+          // Si la distancia es mayor a la definida en el schema, ocultar el panel
+          if (distance > this.data.distance) {
+            this.el.setAttribute('visible', false); // Oculta el panel o imagen
+          }
         }
       });
     }
@@ -129,7 +149,7 @@ export default function Home({ infoData }) {
           </a-entity>
 
           {/* Botones interactivos para mostrar el panel de información */}
-          <a-entity id="panelButtons" position="0 1.6 -1.5">
+          <a-entity id="panelButtons" position="0 3.5 -1.5">
             <a-entity id="panel1" class="clickable panel-button" geometry="primitive: plane; width: 0.5; height: 0.5"
               material="color: Red" position="-0.5 0 0" text="value: Ver Panel; align: center; color: White"
               panel-button-handler>
@@ -139,13 +159,15 @@ export default function Home({ infoData }) {
           {/* Panel de información si existe */}
           {currentPanel && (
             <>
-              <a-entity id="infoPanel" position="0 2.5 -1" geometry="primitive: plane; width: 1.5; height: 1.0"
-                material="color: #333" text={`value: ${currentPanel.description}; color: #FFF; wrapCount: 30;`}>
+              <a-entity id="infoPanel" position=".5 3.5 -1.1" geometry="primitive: plane; width: 1.5; height: 1.0"
+                material="color: #333" text={`value: ${currentPanel.description}; color: #FFF; wrapCount: 30;`}
+                visible="true" >
               </a-entity>
 
               {currentPanel.hasPanelImage && (
-                <a-entity id="imagePanel" position="0 1 -1.5" geometry="primitive: plane; width: 1.5; height: 1.0"
-                  material={`src: ${currentPanel.panelImage}; color: #FFF`}>
+                <a-entity id="imagePanel" position="-1 3.5 -1.1" geometry="primitive: plane; width: 1.5; height: 1.0"  // La imagen se acercó 0.1 unidades más
+                  material={`src: ${currentPanel.panelImage}; color: #FFF`} 
+                  visible="true" close-on-look-away="distance: 2.5">
                 </a-entity>
               )}
             </>
