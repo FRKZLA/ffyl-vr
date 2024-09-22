@@ -1,0 +1,17 @@
+{
+    "areas": {
+      "area1": {
+        "image": "/image/Hallway.jpg",
+        "description": "Esta es el área 1, contiene esculturas importantes.",
+        "hasPanelImage": true,
+        "panelImage": "/image/panel1.png"
+      },
+      "area2": {
+        "image": "/image/Lab.jpg",
+        "description": "Esta es el área 2, con pinturas de renombre.",
+        "hasPanelImage": true,
+        "panelImage": "/image/panel2.png"
+      }
+    }
+  }
+  

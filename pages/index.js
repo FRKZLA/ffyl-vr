@@ -5,28 +5,26 @@ import fs from 'fs';
 import path from 'path';
 
 export async function getStaticProps() {
-  // Cargar los archivos de texto
-  const infoAPath = path.join(process.cwd(), 'public/data/InfoA.txt');
-  const infoBPath = path.join(process.cwd(), 'public/data/InfoB.txt');
-  const infoAContent = fs.readFileSync(infoAPath, 'utf8');
-  const infoBContent = fs.readFileSync(infoBPath, 'utf8');
+  // Cargar el archivo JSON con la información
+  const infoPath = path.join(process.cwd(), 'public/data/info.json');
+  const infoContent = fs.readFileSync(infoPath, 'utf8');
+  const infoData = JSON.parse(infoContent);
 
   return {
     props: {
-      infoAContent,
-      infoBContent
+      infoData
     }
   };
 }
 
-export default function Home({ infoAContent, infoBContent }) {
+export default function Home({ infoData }) {
   const [isClient, setIsClient] = useState(false);
   const [isMobileOrVR, setIsMobileOrVR] = useState(false);
-  const [currentImage, setCurrentImage] = useState('/data/InfoA.png');
-  const [currentText, setCurrentText] = useState(infoAContent);
+  const [currentArea, setCurrentArea] = useState('area1'); // Area inicial
+  const [currentPanel, setCurrentPanel] = useState(null); // Panel inicial
 
   useEffect(() => {
-    setIsClient(true); // Esto asegura que el componente se renderice solo en el cliente
+    setIsClient(true); // Asegura que el componente se renderice solo en el cliente
 
     // Detectar si es Oculus
     const userAgent = navigator.userAgent || navigator.vendor || window.opera;
@@ -36,26 +34,26 @@ export default function Home({ infoAContent, infoBContent }) {
       setIsMobileOrVR(false);
     }
 
-    // Añadir el evento de clic a los botones después de que A-Frame se cargue
+    // Añadir eventos de clic a los botones de áreas y paneles después de que A-Frame se cargue
     if (window.AFRAME) {
-      const buttonA = document.querySelector('#buttonA');
-      const buttonB = document.querySelector('#buttonB');
-
-      if (buttonA) {
-        buttonA.addEventListener('click', () => {
-          setCurrentImage('/data/InfoA.png');
-          setCurrentText(infoAContent);
+      const areaButtons = document.querySelectorAll('.area-button');
+      areaButtons.forEach(button => {
+        button.addEventListener('click', (evt) => {
+          const areaId = evt.target.id; // Identifica el área
+          setCurrentArea(areaId); // Cambia el área actual
+          setCurrentPanel(null); // Resetea el panel cuando cambias de área
         });
-      }
+      });
 
-      if (buttonB) {
-        buttonB.addEventListener('click', () => {
-          setCurrentImage('/data/InfoB.png');
-          setCurrentText(infoBContent);
+      const panelButtons = document.querySelectorAll('.panel-button');
+      panelButtons.forEach(button => {
+        button.addEventListener('click', (evt) => {
+          const panelId = evt.target.id; // Identifica el panel
+          setCurrentPanel(infoData.areas[currentArea]); // Carga la información del panel actual
         });
-      }
+      });
     }
-  }, [infoAContent, infoBContent]);
+  }, [currentArea, infoData]);
 
   return (
     <div>
@@ -72,7 +70,7 @@ export default function Home({ infoAContent, infoBContent }) {
           #__next {
             height: 100%;
           }
-          .a-enter-vr-button a-enter-ar-button{
+          .a-enter-vr-button{
             position: fixed !important;
             bottom: 25px !important;
             right: 25px !important;
@@ -86,10 +84,13 @@ export default function Home({ infoAContent, infoBContent }) {
             font-size: 14px !important;
             border-radius: 10px !important;
           }
+          .a-enter-ar-button{
+            visibility: hidden !important;
+          }
         `}</style>
       </Head>
 
-      {/* Cargamos el script de A-Frame */}
+      {/* Cargar el script de A-Frame */}
       <Script src="https://aframe.io/releases/1.3.0/aframe.min.js" strategy="beforeInteractive" />
 
       {isClient ? (
@@ -106,33 +107,41 @@ export default function Home({ infoAContent, infoBContent }) {
             </a-camera>
           </a-entity>
 
-          {/* Cargar las imágenes como assets */}
-          <a-assets>
-            <img id="infoA" src="/data/InfoA.png" crossorigin="anonymous" />
-            <img id="infoB" src="/data/InfoB.png" crossorigin="anonymous" />
-          </a-assets>
+          {/* Skybox con la imagen del área actual */}
+          <a-sky src={infoData.areas[currentArea].image} rotation="0 0 0"></a-sky>
 
-          {/* Skybox con la imagen actual */}
-          <a-sky src="/image/Hallway.jpg" rotation="0 0 0"></a-sky>
-
-          {/* Botones interactivos */}
-          <a-entity id="ui" position="0 1.6 -2.5">
-            {/* Botón para InfoA */}
-            <a-entity id="buttonA" class="clickable" geometry="primitive: plane; width: 0.5; height: 0.5"
-              material="color: Blue" position="-0.75 0 0" text="value: Info A; align: center; color: Red">
+          {/* Botones interactivos para cambiar de área */}
+          <a-entity id="areaButtons" position="0 1.6 -2.5">
+            <a-entity id="area1" class="clickable area-button" geometry="primitive: plane; width: 0.5; height: 0.5"
+              material="color: Blue" position="-0.75 0 0" text="value: Área 1; align: center; color: Red">
             </a-entity>
 
-            {/* Botón para InfoB */}
-            <a-entity id="buttonB" class="clickable" geometry="primitive: plane; width: 0.5; height: 0.5"
-              material="color: Yellow" position="0.75 0 0" text="value: Info B; align: center; color: Green">
+            <a-entity id="area2" class="clickable area-button" geometry="primitive: plane; width: 0.5; height: 0.5"
+              material="color: Yellow" position="0.75 0 0" text="value: Área 2; align: center; color: Green">
             </a-entity>
           </a-entity>
 
-          {/* Panel de información para mostrar el texto correspondiente */}
-          <a-entity id="infoPanel" position="0 0 -2" geometry="primitive: plane; width: 1.5; height: 1.0"
-            material="color: #333" text={`value: ${currentText}; color: #FFF; wrapCount: 30;`}>
+          {/* Botones interactivos para mostrar el panel de información */}
+          <a-entity id="panelButtons" position="0 1.6 -1.5">
+            <a-entity id="panel1" class="clickable panel-button" geometry="primitive: plane; width: 0.5; height: 0.5"
+              material="color: Red" position="-0.5 0 0" text="value: Ver Panel; align: center; color: White">
+            </a-entity>
           </a-entity>
 
+          {/* Panel de información si existe */}
+          {currentPanel && (
+            <>
+              <a-entity id="infoPanel" position="0 2.5 -1" geometry="primitive: plane; width: 1.5; height: 1.0"
+                material="color: #333" text={`value: ${currentPanel.description}; color: #FFF; wrapCount: 30;`}>
+              </a-entity>
+
+              {currentPanel.hasPanelImage && (
+                <a-entity id="imagePanel" position="0 1 -1.5" geometry="primitive: plane; width: 1.5; height: 1.0"
+                  material={`src: ${currentPanel.panelImage}; color: #FFF`}>
+                </a-entity>
+              )}
+            </>
+          )}
         </a-scene>
       ) : (
         <p>Cargando VR...</p>
