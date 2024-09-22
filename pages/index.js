@@ -60,7 +60,7 @@ export default function Home({ infoData }) {
                 setCurrentPanel(infoData.info[data.area]); // Muestra el panel de información
                 setPanelExpanded(true); // Expande el panel
               } else if (data.type === 'close') {
-                setCurrentPanel(null); // Cerrar el panel
+                setCurrentPanel(null); // Cierra el panel cuando se hace clic en el botón de cerrar
               }
             }, 500); // Retardo de medio segundo
           });
@@ -80,7 +80,8 @@ export default function Home({ infoData }) {
         tick: function () {
           const camera = document.querySelector('[camera]');
           if (camera) {
-            const cameraPosition = camera.object3D.getWorldPosition(new THREE.Vector3());
+            const cameraPosition = camera.object3D.position;
+            const elPosition = this.el.object3D.position;
             this.el.object3D.lookAt(cameraPosition);
           }
         }
@@ -128,7 +129,7 @@ export default function Home({ infoData }) {
 
       {isClient ? (
         <a-scene vr-mode-ui="enabled: true" embedded style={{ position: 'relative', width: '100vw', height: '100vh' }}>
-          <a-entity position="0 1.6 0">
+          <a-entity position="0 0 0">
             <a-camera look-controls="enabled: true; touchEnabled: true; magicWindowTrackingEnabled: true" wasd-controls="enabled: false">
               <a-cursor
                 raycaster="objects: .clickable"
@@ -145,48 +146,44 @@ export default function Home({ infoData }) {
           {/* Skybox con la imagen del área actual */}
           <a-sky src={infoData.area[currentArea].image} rotation="0 0 0"></a-sky>
 
-          {/* Distribución manual de botones */}
+          {/* Botones distribuidos manualmente */}
           <a-entity id="areaButtons">
-            {/* Botón 1 */}
             <a-entity id="hallway" class="clickable" 
-              button-handler="area: hallway; type: area"
+              button-handler={`area: hallway; type: area`}
               geometry="primitive: plane; width: 0.5; height: 0.3"
               material="color: black; opacity: 0.5"
-              position="-1 1.5 -1" 
-              text="value: Hallway; align: center; color: white; font: mozillavr;"
+              position="0 1.6 -2" // Manualmente ajustado
+              text="value: Hallway; align: center; color: white"
               face-camera>
             </a-entity>
 
-            {/* Botón 2 */}
             <a-entity id="office" class="clickable" 
-              button-handler="area: office; type: area"
+              button-handler={`area: office; type: area`}
               geometry="primitive: plane; width: 0.5; height: 0.3"
               material="color: black; opacity: 0.5"
-              position="1 1.5 -1"
-              text="value: Office; align: center; color: white; font: mozillavr;"
+              position="1.5 1.6 -2" // Manualmente ajustado
+              text="value: Office; align: center; color: white"
               face-camera>
             </a-entity>
           </a-entity>
 
-          {/* Distribución manual de botones de información */}
+          {/* Botones de información distribuidos manualmente */}
           <a-entity id="infoButtons">
-            {/* Botón Información 1 */}
-            <a-entity id="pinturaA" class="clickable" 
-              button-handler="area: pinturaA; type: info"
+            <a-entity id="punto1" class="clickable" 
+              button-handler={`area: punto 1; type: info`}
               geometry="primitive: plane; width: 0.5; height: 0.3"
               material="color: black; opacity: 0.5"
-              position="0 1.5 -2"
-              text="value: Pintura A; align: center; color: white; font: mozillavr;"
+              position="0 2.0 -2.5" // Manualmente ajustado
+              text="value: Información 1; align: center; color: white"
               face-camera>
             </a-entity>
 
-            {/* Botón Información 2 */}
-            <a-entity id="pinturaB" class="clickable" 
-              button-handler="area: pinturaB; type: info"
+            <a-entity id="pinturaA" class="clickable" 
+              button-handler={`area: pintura A; type: info`}
               geometry="primitive: plane; width: 0.5; height: 0.3"
               material="color: black; opacity: 0.5"
-              position="2 1.5 -1"
-              text="value: Pintura B; align: center; color: white; font: mozillavr;"
+              position="1.5 2.0 -2.5" // Manualmente ajustado
+              text="value: Pintura A; align: center; color: white"
               face-camera>
             </a-entity>
           </a-entity>
@@ -211,7 +208,7 @@ export default function Home({ infoData }) {
                 position="1.4 0.6 0.1"
                 text="value: X; color: white; align: center"
                 class="clickable"
-                button-handler="area: close; type: close">
+                button-handler={`area: close; type: close`}>
               </a-entity>
             </a-entity>
           )}
