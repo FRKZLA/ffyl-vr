@@ -1,24 +1,19 @@
 import { useEffect, useState } from 'react';
 import Head from 'next/head';
-import Script from 'next/script'; // Importamos Script de Next.js
+import Script from 'next/script';
 
 export default function Home() {
   const [isClient, setIsClient] = useState(false);
-  const [currentImage, setCurrentImage] = useState('/image/Hallway.jpg'); // Estado para controlar la imagen
+  const [currentImage, setCurrentImage] = useState('/image/Hallway.jpg');
 
   useEffect(() => {
     setIsClient(true);
-    console.log("A-Frame initialized"); // Verificar que A-Frame se está cargando
   }, []);
 
   // Función para cambiar la imagen a Office.jpg
   const changeScene = () => {
     setCurrentImage('/image/Office.jpg');
-    console.log("Image changed to Office.jpg"); // Verificar que la función changeScene funciona
   };
-
-  // Imprimir el estado de la imagen actual
-  console.log("Current image:", currentImage);
 
   return (
     <div>
@@ -31,43 +26,41 @@ export default function Home() {
       <Script src="https://aframe.io/releases/1.3.0/aframe.min.js" strategy="beforeInteractive" />
 
       {isClient ? (
-        <>
-          {/* Verificamos si a-scene está siendo renderizado */}
-          <p>Rendering A-Frame scene...</p>
+        <a-scene vr-mode-ui="enabled: false"> {/* Deshabilitamos el Cardboard UI */}
+          {/* Cámara con controles de vista para PC, móviles y VR */}
+          <a-entity position="0 1.6 0">
+            <a-camera look-controls="enabled: true; touchEnabled: true">
+              <a-cursor
+                raycaster="objects: .clickable"
+                fuse="true"
+                fuse-timeout="500"
+                material="color: black; shader: flat"
+                geometry="primitive: ring; radiusInner: 0.02; radiusOuter: 0.03"
+              ></a-cursor>
+            </a-camera>
+          </a-entity>
 
-          <a-scene embedded vr-mode-ui="enabled: true" cursor="rayOrigin: mouse">
-            {/* Cámara y cursor para VR */}
-            <a-entity position="0 1.6 0">
-              <a-camera>
-                <a-cursor></a-cursor>
-              </a-camera>
-            </a-entity>
+          {/* Skybox con la imagen controlada por el estado */}
+          <a-sky src={currentImage} rotation="0 0 0"></a-sky>
 
-            {/* Skybox con la imagen controlada por el estado */}
-            <a-sky src={currentImage} rotation="0 0 0"></a-sky>
+          {/* Botón interactivo para cambiar la escena */}
+          <a-entity
+            class="clickable"
+            geometry="primitive: plane; width: 2; height: 0.8"
+            material="color: #333"
+            position="0 1.5 -3"
+            text="value: Oficina; align: center"
+            event-set__mouseenter="material.color: #7BC8A4"
+            event-set__mouseleave="material.color: #333"
+            onclick={changeScene}  // Cambia la escena cuando se hace clic
+          ></a-entity>
 
-            {/* Elemento de prueba: Cubo */}
-            <a-box position="0 1 -3" rotation="0 45 0" color="#4CC3D9" depth="1" height="1" width="1"></a-box>
-
-            {/* Botón interactivo para cambiar la escena */}
-            <a-entity 
-              geometry="primitive: plane; width: 2; height: 0.8"
-              material="color: #333" // Color oscuro para mejor visibilidad
-              position="0 1.5 -3" 
-              rotation="0 0 0"
-              text="value: Oficina; align: center"
-              event-set__mouseenter="material.color: #7BC8A4"  // Cambiar color al centrar
-              event-set__mouseleave="material.color: #333"  // Cambiar de nuevo al salir
-              onclick={changeScene}  // Cambia la escena cuando se hace clic
-            ></a-entity>
-
-            {/* Agregar luces para mejorar la visibilidad */}
-            <a-light type="ambient" color="#ffffff"></a-light>
-            <a-light type="directional" position="-1 1 0" intensity="1"></a-light>
-          </a-scene>
-        </>
+          {/* Luces para mejorar la visibilidad */}
+          <a-light type="ambient" color="#ffffff"></a-light>
+          <a-light type="directional" position="-1 1 0" intensity="1"></a-light>
+        </a-scene>
       ) : (
-        <p>Cargando VR...</p> // Mensaje mientras se renderiza en el cliente
+        <p>Cargando VR...</p>
       )}
     </div>
   );
