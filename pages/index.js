@@ -23,10 +23,18 @@ export default function Home() {
       </Head>
 
       {/* Cargamos el script de A-Frame */}
-      <Script src="../../../dist/aframe-master.js" strategy="beforeInteractive" />
+      <Script src="https://aframe.io/releases/1.2.0/aframe.min.js" strategy="beforeInteractive" />
 
       {isClient ? (
-        <a-scene>
+        <a-scene embedded vr-mode-ui="enabled: true" cursor="rayOrigin: mouse">
+          {/* Habilitar controles y modo inmersivo */}
+          <a-entity position="0 1.6 0">
+            {/* Cursor para interacción en VR */}
+            <a-camera>
+              <a-cursor></a-cursor>
+            </a-camera>
+          </a-entity>
+
           {/* Skybox con la imagen controlada por el estado */}
           <a-sky src={currentImage} rotation="0 0 0"></a-sky>
 
@@ -37,9 +45,10 @@ export default function Home() {
             position="0 1.5 -3" 
             rotation="0 0 0"
             text="value: Oficina; align: center"
-            event-set__click="material.color: #7BC8A4" // Cambia color al hacer clic
+            event-set__mouseenter="material.color: #7BC8A4"  // Cambiar color al centrar
+            event-set__mouseleave="material.color: #FFC65D"  // Cambiar de nuevo al salir
             class="clickable"
-            onclick={changeScene} // Cambia la escena cuando se hace clic
+            onclick={changeScene}  // Cambia la escena cuando se hace clic
           ></a-entity>
         </a-scene>
       ) : (
