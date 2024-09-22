@@ -4,10 +4,19 @@ import Script from 'next/script';
 
 export default function Home() {
   const [isClient, setIsClient] = useState(false);
+  const [isMobileOrVR, setIsMobileOrVR] = useState(false);
   const [currentImage, setCurrentImage] = useState('/image/Hallway.jpg');
 
   useEffect(() => {
     setIsClient(true); // Esto asegura que el componente se renderice solo en el cliente
+
+    // Detectar si es móvil o VR
+    const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+    if (/android|iPhone|iPad|iPod|Oculus|SamsungBrowser/i.test(userAgent)) {
+      setIsMobileOrVR(true);
+    } else {
+      setIsMobileOrVR(false);
+    }
   }, []);
 
   // Función para cambiar la imagen a Office.jpg
@@ -25,18 +34,18 @@ export default function Home() {
           html, body {
             margin: 0;
             padding: 0;
-            overflow: hidden; /* Elimina scrollbars */
-            height: 100%; /* Asegura que ocupe el 100% del alto */
+            overflow: hidden;
+            height: 100%;
           }
           #__next {
-            height: 100%; /* Asegura que ocupe el 100% del alto */
+            height: 100%;
           }
-          .a-enter-vr-button, .a-enter-ar-button { /* Asegura que los botones AR y VR tengan el mismo estilo */
+          .a-enter-vr-button {
             position: fixed !important;
             bottom: 25px !important;
             right: 25px !important;
             z-index: 9999 !important;
-            visibility: hidden !important;
+            visibility: ${isMobileOrVR ? 'visible' : 'hidden'} !important; /* Mostrar solo en Móvil y VR */
             width: 105px !important;
             height: 70px !important;
             background-color: rgba(0, 0, 0, 0.5) !important;
@@ -44,6 +53,9 @@ export default function Home() {
             border: none !important;
             font-size: 14px !important;
             border-radius: 10px !important;
+          }
+          .a-enter-ar-button {
+            visibility: hidden !important;
           }
         `}</style>
       </Head>
