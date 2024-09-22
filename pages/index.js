@@ -20,7 +20,7 @@ export async function getStaticProps() {
 export default function Home({ infoData }) {
   const [isClient, setIsClient] = useState(false);
   const [isMobileOrVR, setIsMobileOrVR] = useState(false);
-  const [currentArea, setCurrentArea] = useState('area1'); // Area inicial
+  const [currentArea, setCurrentArea] = useState('area1'); // Área inicial
   const [currentPanel, setCurrentPanel] = useState(null); // Panel inicial
 
   useEffect(() => {
@@ -34,23 +34,28 @@ export default function Home({ infoData }) {
       setIsMobileOrVR(false);
     }
 
-    // Añadir eventos de clic a los botones de áreas y paneles después de que A-Frame se cargue
-    if (window.AFRAME) {
-      const areaButtons = document.querySelectorAll('.area-button');
-      areaButtons.forEach(button => {
-        button.addEventListener('click', (evt) => {
-          const areaId = evt.target.id; // Identifica el área
-          setCurrentArea(areaId); // Cambia el área actual
-          setCurrentPanel(null); // Resetea el panel cuando cambias de área
-        });
+    // Verificar si los componentes ya están registrados antes de registrarlos
+    if (window.AFRAME && !AFRAME.components['area-button-handler']) {
+      AFRAME.registerComponent('area-button-handler', {
+        init: function () {
+          const el = this.el;
+          el.addEventListener('click', () => {
+            const areaId = el.getAttribute('id'); // Identifica el área
+            setCurrentArea(areaId); // Cambia el área actual
+            setCurrentPanel(null); // Resetea el panel cuando cambias de área
+          });
+        }
       });
+    }
 
-      const panelButtons = document.querySelectorAll('.panel-button');
-      panelButtons.forEach(button => {
-        button.addEventListener('click', (evt) => {
-          const panelId = evt.target.id; // Identifica el panel
-          setCurrentPanel(infoData.areas[currentArea]); // Carga la información del panel actual
-        });
+    if (window.AFRAME && !AFRAME.components['panel-button-handler']) {
+      AFRAME.registerComponent('panel-button-handler', {
+        init: function () {
+          const el = this.el;
+          el.addEventListener('click', () => {
+            setCurrentPanel(infoData.areas[currentArea]); // Cargar la información del panel actual
+          });
+        }
       });
     }
   }, [currentArea, infoData]);
@@ -99,8 +104,8 @@ export default function Home({ infoData }) {
             <a-camera look-controls="enabled: true; touchEnabled: true; magicWindowTrackingEnabled: true" wasd-controls="enabled: false">
               <a-cursor
                 raycaster="objects: .clickable"
-                fuse="true"
-                fuse-timeout="500"
+                fuse="true"                    // Activar fuse (clic después de mantener el puntero sobre el objeto)
+                fuse-timeout="1500"            // Tiempo que tarda en activarse (1500ms)
                 material="color: red; shader: flat"
                 geometry="primitive: ring; radiusInner: 0.02; radiusOuter: 0.03"
               ></a-cursor>
@@ -113,18 +118,21 @@ export default function Home({ infoData }) {
           {/* Botones interactivos para cambiar de área */}
           <a-entity id="areaButtons" position="0 1.6 -2.5">
             <a-entity id="area1" class="clickable area-button" geometry="primitive: plane; width: 0.5; height: 0.5"
-              material="color: Blue" position="-0.75 0 0" text="value: Área 1; align: center; color: Red">
+              material="color: Blue" position="-0.75 0 0" text="value: Área 1; align: center; color: Red"
+              area-button-handler>
             </a-entity>
 
             <a-entity id="area2" class="clickable area-button" geometry="primitive: plane; width: 0.5; height: 0.5"
-              material="color: Yellow" position="0.75 0 0" text="value: Área 2; align: center; color: Green">
+              material="color: Yellow" position="0.75 0 0" text="value: Área 2; align: center; color: Green"
+              area-button-handler>
             </a-entity>
           </a-entity>
 
           {/* Botones interactivos para mostrar el panel de información */}
           <a-entity id="panelButtons" position="0 1.6 -1.5">
             <a-entity id="panel1" class="clickable panel-button" geometry="primitive: plane; width: 0.5; height: 0.5"
-              material="color: Red" position="-0.5 0 0" text="value: Ver Panel; align: center; color: White">
+              material="color: Red" position="-0.5 0 0" text="value: Ver Panel; align: center; color: White"
+              panel-button-handler>
             </a-entity>
           </a-entity>
 
