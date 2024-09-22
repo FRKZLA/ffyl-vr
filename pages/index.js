@@ -39,7 +39,7 @@ export default function Home({ infoData }) {
       AFRAME.registerComponent('area-button-handler', {
         init: function () {
           const el = this.el;
-          el.addEventListener('click', () => {
+          el.addEventListener('mouseenter', () => {
             const areaId = el.getAttribute('id'); // Identifica el área
             setCurrentArea(areaId); // Cambia el área actual
             setCurrentPanel(null); // Resetea el panel cuando cambias de área
@@ -52,29 +52,13 @@ export default function Home({ infoData }) {
       AFRAME.registerComponent('panel-button-handler', {
         init: function () {
           const el = this.el;
-          el.addEventListener('click', () => {
+          el.addEventListener('mouseenter', () => {
             setCurrentPanel(infoData.areas[currentArea]); // Cargar la información del panel actual
           });
-        }
-      });
-    }
 
-    // Registrar el componente para cerrar el panel cuando se aleje la vista
-    if (window.AFRAME && !AFRAME.components['close-on-look-away']) {
-      AFRAME.registerComponent('close-on-look-away', {
-        schema: {
-          distance: { type: 'number', default: 1 } // Distancia de cierre
-        },
-        tick: function () {
-          const cameraEl = document.querySelector('[camera]');
-          const cameraPos = cameraEl.object3D.position;
-          const elPos = this.el.object3D.position;
-          const distance = cameraPos.distanceTo(elPos);
-
-          // Si la distancia es mayor a la definida en el schema, ocultar el panel
-          if (distance > this.data.distance) {
-            this.el.setAttribute('visible', false); // Oculta el panel o imagen
-          }
+          el.addEventListener('mouseleave', () => {
+            setCurrentPanel(null); // Ocultar panel cuando el cursor se aleje
+          });
         }
       });
     }
@@ -159,17 +143,22 @@ export default function Home({ infoData }) {
           {/* Panel de información si existe */}
           {currentPanel && (
             <>
-              <a-entity id="infoPanel" position=".5 3.5 -1.1" geometry="primitive: plane; width: 1.5; height: 1.0"
-                material="color: #333" text={`value: ${currentPanel.description}; color: #FFF; wrapCount: 30;`}
-                visible="true" >
-              </a-entity>
-
-              {currentPanel.hasPanelImage && (
-                <a-entity id="imagePanel" position="-1 3.5 -1.1" geometry="primitive: plane; width: 1.5; height: 1.0"  // La imagen se acercó 0.1 unidades más
-                  material={`src: ${currentPanel.panelImage}; color: #FFF`} 
-                  visible="true" close-on-look-away="distance: 2.5">
+              {/* Panel con esquinas redondeadas y transparencia */}
+              <a-entity id="roundedPanel" position="0 3.5 -1.2" geometry="primitive: plane; width: 3.0; height: 1.5;"
+                material="color: #333; opacity: 0.5" radius="3">
+                
+                {/* Texto (lado izquierdo) */}
+                <a-entity id="infoPanelText" position="-0.75 0 0.1" geometry="primitive: plane; width: 1.0; height: 1.0"
+                  material="color: transparent" text={`value: ${currentPanel.description}; color: #FFF; wrapCount: 30;`}>
                 </a-entity>
-              )}
+
+                {/* Imagen (lado derecho) */}
+                {currentPanel.hasPanelImage && (
+                  <a-entity id="infoPanelImage" position="1 0 0.1" geometry="primitive: plane; width: 1.0; height: 1.0"
+                    material={`src: ${currentPanel.panelImage}; color: #FFF`}>
+                  </a-entity>
+                )}
+              </a-entity>
             </>
           )}
         </a-scene>
