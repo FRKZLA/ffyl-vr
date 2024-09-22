@@ -58,7 +58,7 @@ export default function Home() {
             class="clickable"
             geometry="primitive: plane; width: 1; height: 0.5"
             material="color: #333"
-            position="0 1.5 -2"
+            position="0 3.2 -2"
             text="value: Oficina; align: center; color: #FFF"
             event-set__mouseenter="material.color: #7BC8A4"
             event-set__mouseleave="material.color: #333"
