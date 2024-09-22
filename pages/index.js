@@ -28,7 +28,7 @@ export default function Home() {
       </Head>
 
       {/* Cargamos el script de A-Frame */}
-      <Script src="https://aframe.io/releases/1.2.0/aframe.min.js" strategy="beforeInteractive" />
+      <Script src="https://aframe.io/releases/1.3.0/aframe.min.js" strategy="beforeInteractive" />
 
       {isClient ? (
         <>
@@ -45,6 +45,9 @@ export default function Home() {
 
             {/* Skybox con la imagen controlada por el estado */}
             <a-sky src={currentImage} rotation="0 0 0"></a-sky>
+
+            {/* Elemento de prueba: Cubo */}
+            <a-box position="0 1 -3" rotation="0 45 0" color="#4CC3D9" depth="1" height="1" width="1"></a-box>
 
             {/* Botón interactivo para cambiar la escena */}
             <a-entity 
