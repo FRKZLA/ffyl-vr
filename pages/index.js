@@ -59,6 +59,8 @@ export default function Home({ infoData }) {
               } else if (data.type === 'info') {
                 setCurrentPanel(infoData.info[data.area]); // Muestra el panel de información
                 setPanelExpanded(true); // Expande el panel
+              } else if (data.type === 'close') {
+                setCurrentPanel(null); // Cerrar el panel
               }
             }, 500); // Retardo de medio segundo
           });
@@ -78,8 +80,7 @@ export default function Home({ infoData }) {
         tick: function () {
           const camera = document.querySelector('[camera]');
           if (camera) {
-            const cameraPosition = camera.object3D.position;
-            const elPosition = this.el.object3D.position;
+            const cameraPosition = camera.object3D.getWorldPosition(new THREE.Vector3());
             this.el.object3D.lookAt(cameraPosition);
           }
         }
@@ -127,7 +128,7 @@ export default function Home({ infoData }) {
 
       {isClient ? (
         <a-scene vr-mode-ui="enabled: true" embedded style={{ position: 'relative', width: '100vw', height: '100vh' }}>
-          <a-entity position="0 0 0">
+          <a-entity position="0 1.6 0">
             <a-camera look-controls="enabled: true; touchEnabled: true; magicWindowTrackingEnabled: true" wasd-controls="enabled: false">
               <a-cursor
                 raycaster="objects: .clickable"
@@ -144,49 +145,55 @@ export default function Home({ infoData }) {
           {/* Skybox con la imagen del área actual */}
           <a-sky src={infoData.area[currentArea].image} rotation="0 0 0"></a-sky>
 
-          {/* Distribuir botones en círculo alrededor del usuario */}
+          {/* Distribución manual de botones */}
           <a-entity id="areaButtons">
-            {Object.keys(infoData.area).map((key, index) => {
-              const angle = (index / Object.keys(infoData.area).length) * Math.PI * 2;
-              const x = Math.cos(angle) * 2; // Distancia radial
-              const z = Math.sin(angle) * 2; // Distancia radial
-              return (
-                <a-entity key={key} class="clickable" 
-                  id={key}
-                  button-handler={`area: ${key}; type: area`}
-                  geometry="primitive: plane; width: 0.5; height: 0.3"
-                  material="color: black; opacity: 0.5"
-                  position={`${x} 3 ${z}`}
-                  text={`value: ${infoData.area[key].description}; align: center; color: white; font: mozillavr;`}
-                  face-camera>
-                </a-entity>
-              );
-            })}
+            {/* Botón 1 */}
+            <a-entity id="hallway" class="clickable" 
+              button-handler="area: hallway; type: area"
+              geometry="primitive: plane; width: 0.5; height: 0.3"
+              material="color: black; opacity: 0.5"
+              position="-1 1.5 -1" 
+              text="value: Hallway; align: center; color: white; font: mozillavr;"
+              face-camera>
+            </a-entity>
+
+            {/* Botón 2 */}
+            <a-entity id="office" class="clickable" 
+              button-handler="area: office; type: area"
+              geometry="primitive: plane; width: 0.5; height: 0.3"
+              material="color: black; opacity: 0.5"
+              position="1 1.5 -1"
+              text="value: Office; align: center; color: white; font: mozillavr;"
+              face-camera>
+            </a-entity>
           </a-entity>
 
-          {/* Distribuir botones de información */}
+          {/* Distribución manual de botones de información */}
           <a-entity id="infoButtons">
-            {Object.keys(infoData.info).map((key, index) => {
-              const angle = (index / Object.keys(infoData.info).length) * Math.PI * 2;
-              const x = Math.cos(angle) * 1.5;
-              const z = Math.sin(angle) * 1.5;
-              return (
-                <a-entity key={key} class="clickable" 
-                  id={key}
-                  button-handler={`area: ${key}; type: info`}
-                  geometry="primitive: plane; width: 0.5; height: 0.3"
-                  material="color: black; opacity: 0.5"
-                  position={`${x} 1.5 ${z}`}
-                  text={`value: ${infoData.info[key].description}; align: center; color: white; font: mozillavr;`}
-                  face-camera>
-                </a-entity>
-              );
-            })}
+            {/* Botón Información 1 */}
+            <a-entity id="pinturaA" class="clickable" 
+              button-handler="area: pinturaA; type: info"
+              geometry="primitive: plane; width: 0.5; height: 0.3"
+              material="color: black; opacity: 0.5"
+              position="0 1.5 -2"
+              text="value: Pintura A; align: center; color: white; font: mozillavr;"
+              face-camera>
+            </a-entity>
+
+            {/* Botón Información 2 */}
+            <a-entity id="pinturaB" class="clickable" 
+              button-handler="area: pinturaB; type: info"
+              geometry="primitive: plane; width: 0.5; height: 0.3"
+              material="color: black; opacity: 0.5"
+              position="2 1.5 -1"
+              text="value: Pintura B; align: center; color: white; font: mozillavr;"
+              face-camera>
+            </a-entity>
           </a-entity>
 
           {/* Panel de información */}
           {currentPanel && (
-            <a-entity id="infoPanel" position="0 3 -2" geometry="primitive: plane; width: 3.0; height: 1.5;"
+            <a-entity id="infoPanel" position="0 2 -2" geometry="primitive: plane; width: 3.0; height: 1.5;"
               material="color: #333; opacity: 0.5" 
               text={`value: ${currentPanel.description}; color: white; wrapCount: 30;`}
               face-camera
@@ -204,7 +211,7 @@ export default function Home({ infoData }) {
                 position="1.4 0.6 0.1"
                 text="value: X; color: white; align: center"
                 class="clickable"
-                button-handler={`area: close; type: close`}>
+                button-handler="area: close; type: close">
               </a-entity>
             </a-entity>
           )}
