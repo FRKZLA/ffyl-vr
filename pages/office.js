@@ -1,8 +1,10 @@
+// pages/office.js
+
 import { useEffect, useState } from 'react';
 import Head from 'next/head';
 import Script from 'next/script';
 
-export default function Home() {
+export default function Office() {
   const [isClient, setIsClient] = useState(false);
   const [isMobileOrVR, setIsMobileOrVR] = useState(false);
 
@@ -18,17 +20,12 @@ export default function Home() {
     }
   }, []);
 
-  // Función para redirigir a la página de la oficina
-  const redirectToOffice = () => {
-    window.location.href = '/office';
-  };
-
   return (
     <div>
       <Head>
-        <title>FFyL 360°</title>
-        <meta name="description" content="FFyL 360°" />
-        {/* Agregar estilos */}
+        <title>FFyL 360° - Oficina</title>
+        <meta name="description" content="Vista de Oficina" />
+        {/* Estilos */}
         <style>{`
           html, body {
             margin: 0;
@@ -72,21 +69,8 @@ export default function Home() {
             </a-camera>
           </a-entity>
 
-          {/* Skybox con la imagen del pasillo */}
-          <a-sky src="/image/Hallway.jpg" rotation="0 0 0"></a-sky>
-
-          {/* Botón para navegar a la página de la Oficina */}
-          <a-entity
-            class="clickable"
-            geometry="primitive: plane; width: 1.5; height: 0.7" 
-            material="color: #333"
-            position="0 1.5 -3"  
-            text="value: Oficina; align: center; color: #FFF"
-            event-set__mouseenter="material.color: #7BC8A4"
-            event-set__mouseleave="material.color: #333"
-            event-set__click="material.color: #00FF00"
-            onclick={redirectToOffice}  // Usamos window.location.href para redirigir
-          ></a-entity>
+          {/* Skybox con la imagen de la Oficina */}
+          <a-sky src="/image/Office.jpg" rotation="0 0 0"></a-sky>
 
         </a-scene>
       ) : (
