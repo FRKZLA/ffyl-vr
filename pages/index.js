@@ -12,7 +12,7 @@ export default function Home() {
 
     // Detectar si es móvil o VR
     const userAgent = navigator.userAgent || navigator.vendor || window.opera;
-    if (/android|iPhone|iPad|iPod|Oculus|SamsungBrowser/i.test(userAgent)) {
+    if (/Oculus/i.test(userAgent)) {
       setIsMobileOrVR(true);
     } else {
       setIsMobileOrVR(false);
