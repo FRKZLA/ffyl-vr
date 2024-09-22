@@ -18,18 +18,17 @@ export default function Home() {
       setIsMobileOrVR(false);
     }
 
-    // Añadir el listener para el clic en el botón
-    const buttonEntity = document.querySelector('#change-scene-button');
-    if (buttonEntity) {
-      buttonEntity.addEventListener('click', changeScene);
+    // Verificar si el componente 'click-handler' ya está registrado
+    if (window.AFRAME && !AFRAME.components['click-handler']) {
+      // Registrar un componente de clic personalizado en A-Frame para manejar los clics
+      AFRAME.registerComponent('click-handler', {
+        init: function () {
+          this.el.addEventListener('click', function () {
+            changeScene(); // Llama a la función que cambia la imagen
+          });
+        }
+      });
     }
-
-    return () => {
-      // Eliminar el listener al desmontar el componente
-      if (buttonEntity) {
-        buttonEntity.removeEventListener('click', changeScene);
-      }
-    };
   }, []);
 
   // Función para cambiar la imagen a Office.jpg
@@ -82,7 +81,7 @@ export default function Home() {
           <a-entity position="0 1.6 0">
             <a-camera look-controls="enabled: true; touchEnabled: true; magicWindowTrackingEnabled: true" wasd-controls="enabled: false">
               <a-cursor
-                raycaster="objects: .clickable"
+                raycaster="objects: .clickable"  // Cursor configurado para detectar objetos "clickable"
                 fuse="true"
                 fuse-timeout="500"
                 material="color: red; shader: flat"
@@ -104,6 +103,7 @@ export default function Home() {
             text="value: Oficina; align: center; color: #FFF"
             event-set__mouseenter="material.color: #7BC8A4"
             event-set__mouseleave="material.color: #333"
+            click-handler /* Usamos el componente registrado de A-Frame para manejar el clic */
           ></a-entity>
 
         </a-scene>
