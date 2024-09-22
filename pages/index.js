@@ -12,11 +12,24 @@ export default function Home() {
 
     // Detectar si es móvil o VR
     const userAgent = navigator.userAgent || navigator.vendor || window.opera;
-    if (/Oculus/i.test(userAgent)) {
+    if (/Oculus|Android|iPhone/i.test(userAgent)) {
       setIsMobileOrVR(true);
     } else {
       setIsMobileOrVR(false);
     }
+
+    // Añadir el listener para el clic en el botón
+    const buttonEntity = document.querySelector('#change-scene-button');
+    if (buttonEntity) {
+      buttonEntity.addEventListener('click', changeScene);
+    }
+
+    return () => {
+      // Eliminar el listener al desmontar el componente
+      if (buttonEntity) {
+        buttonEntity.removeEventListener('click', changeScene);
+      }
+    };
   }, []);
 
   // Función para cambiar la imagen a Office.jpg
@@ -83,6 +96,7 @@ export default function Home() {
 
           {/* Botón interactivo para cambiar la escena */}
           <a-entity
+            id="change-scene-button" /* Asignamos un id al botón */
             class="clickable"
             geometry="primitive: plane; width: 1.5; height: 0.7" 
             material="color: #333"
@@ -90,7 +104,6 @@ export default function Home() {
             text="value: Oficina; align: center; color: #FFF"
             event-set__mouseenter="material.color: #7BC8A4"
             event-set__mouseleave="material.color: #333"
-            onclick={changeScene}
           ></a-entity>
 
         </a-scene>
