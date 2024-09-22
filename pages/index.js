@@ -36,7 +36,7 @@ export default function Home() {
             bottom: 25px !important;
             right: 25px !important;
             z-index: 9999 !important;
-            visibility: visible !important;
+            visibility: hidden !important;
             width: 105px !important;
             height: 70px !important;
             background-color: rgba(0, 0, 0, 0.5) !important;
