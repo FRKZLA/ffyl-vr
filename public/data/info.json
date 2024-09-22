@@ -1,29 +1,29 @@
 {
-    "areas": {
-      "area1": {
-        "image": "/image/Hallway.jpg",
-        "description": "Punto 1, contiene esculturas importantes.",
-        "hasPanelImage": true,
-        "panelImage": "/data/panel1.png"
-      },
-      "area2": {
-        "image": "/image/Office.jpg",
-        "description": "Punto 2, con pinturas de renombre.",
-        "hasPanelImage": true,
-        "panelImage": "/data/panel2.png"
-      },
-      "area3": {
-        "image": "/image/Lab.jpg",
-        "description": "Punto 3, con pinturas de renombre.",
-        "hasPanelImage": false,
-        "panelImage": "/data/panel1.png"
-      },
-      "area4": {
-        "image": "/image/Studio.jpg",
-        "description": "Punto 4, con pinturas de renombre.",
-        "hasPanelImage": true,
-        "panelImage": "/data/panel2.png"
-      }
+  "area": {
+    "hallway": {
+      "image": "/image/Hallway.jpg",
+      "description": "A long, dark hallway."
+    },
+    "office": {
+      "image": "/image/Office.jpg",
+      "description": "A small, cluttered office."
+    }
+  },
+  "info": {
+    "punto 1": {
+      "image": false,
+      "description": "Punto información, Texto de información.",
+      "panel": true,
+      "panelImage": false
+    },
+    "pintura A": {
+      "panel": true,
+      "description": "pintura A, con texto de prueba.",
+      "panelImage": "/data/panel1.png"
+    },
+    "pintura B": {
+      "panel": false,
+      "panelImage": "/data/panel2.png"
     }
   }
-  
+}

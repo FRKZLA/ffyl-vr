@@ -20,8 +20,9 @@ export async function getStaticProps() {
 export default function Home({ infoData }) {
   const [isClient, setIsClient] = useState(false);
   const [isMobileOrVR, setIsMobileOrVR] = useState(false);
-  const [currentArea, setCurrentArea] = useState('area2'); // Área inicial
+  const [currentArea, setCurrentArea] = useState('hallway'); // Área inicial
   const [currentPanel, setCurrentPanel] = useState(null); // Panel inicial
+  const [fuseActive, setFuseActive] = useState(false); // Estado para controlar el fuse
 
   useEffect(() => {
     setIsClient(true); // Asegura que el componente se renderice solo en el cliente
@@ -35,29 +36,35 @@ export default function Home({ infoData }) {
     }
 
     // Verificar si los componentes ya están registrados antes de registrarlos
-    if (window.AFRAME && !AFRAME.components['area-button-handler']) {
-      AFRAME.registerComponent('area-button-handler', {
+    if (window.AFRAME && !AFRAME.components['button-handler']) {
+      AFRAME.registerComponent('button-handler', {
+        schema: {
+          area: { type: 'string' }, // Recibe el área o información
+          type: { type: 'string' }, // Puede ser "area" o "info"
+        },
         init: function () {
           const el = this.el;
+          const data = this.data;
+          let timeout; // Variable para el retardo
+          
+          // Animación de interacción
           el.addEventListener('mouseenter', () => {
-            const areaId = el.getAttribute('id'); // Identifica el área
-            setCurrentArea(areaId); // Cambia el área actual
-            setCurrentPanel(null); // Resetea el panel cuando cambias de área
-          });
-        }
-      });
-    }
-
-    if (window.AFRAME && !AFRAME.components['panel-button-handler']) {
-      AFRAME.registerComponent('panel-button-handler', {
-        init: function () {
-          const el = this.el;
-          el.addEventListener('mouseenter', () => {
-            setCurrentPanel(infoData.areas[currentArea]); // Cargar la información del panel actual
+            setFuseActive(true); // Activa la animación del cursor
+            el.setAttribute('material', 'opacity', 1); // Resalta el botón
+            timeout = setTimeout(() => {
+              if (data.type === 'area') {
+                setCurrentArea(data.area); // Cambia de área
+                setCurrentPanel(null); // Cierra el panel
+              } else if (data.type === 'info') {
+                setCurrentPanel(infoData.info[data.area]); // Muestra el panel de información
+              }
+            }, 500); // Retardo de medio segundo
           });
 
           el.addEventListener('mouseleave', () => {
-            setCurrentPanel(null); // Ocultar panel cuando el cursor se aleje
+            clearTimeout(timeout); // Cancelar la acción si el cursor sale del área
+            setFuseActive(false); // Detiene la animación del cursor
+            el.setAttribute('material', 'opacity', 0.5); // Restaura el estado normal del botón
           });
         }
       });
@@ -79,7 +86,7 @@ export default function Home({ infoData }) {
           #__next {
             height: 100%;
           }
-          .a-enter-vr-button{
+          .a-enter-vr-button {
             position: fixed !important;
             bottom: 25px !important;
             right: 25px !important;
@@ -93,7 +100,7 @@ export default function Home({ infoData }) {
             font-size: 14px !important;
             border-radius: 10px !important;
           }
-          .a-enter-ar-button{
+          .a-enter-ar-button {
             visibility: hidden !important;
           }
         `}</style>
@@ -110,56 +117,55 @@ export default function Home({ infoData }) {
                 raycaster="objects: .clickable"
                 fuse="true"                    // Activar fuse (clic después de mantener el puntero sobre el objeto)
                 fuse-timeout="1500"            // Tiempo que tarda en activarse (1500ms)
-                material="color: red; shader: flat"
+                material="color: white; shader: flat"
                 geometry="primitive: ring; radiusInner: 0.02; radiusOuter: 0.03"
+                animation__scale="property: scale; to: 2 2 2; easing: easeInOutQuad; dur: 3000; startEvents: fuse-start"
+                animation__scale_reverse="property: scale; to: 1 1 1; easing: easeInOutQuad; dur: 3000; startEvents: fuse-end"
               ></a-cursor>
             </a-camera>
           </a-entity>
 
           {/* Skybox con la imagen del área actual */}
-          <a-sky src={infoData.areas[currentArea].image} rotation="0 0 0"></a-sky>
+          <a-sky src={infoData.area[currentArea].image} rotation="0 0 0"></a-sky>
 
           {/* Botones interactivos para cambiar de área */}
           <a-entity id="areaButtons" position="0 1.6 -2.5">
-            <a-entity id="area1" class="clickable area-button" geometry="primitive: plane; width: 0.5; height: 0.5"
-              material="color: Blue" position="-0.75 0 0" text="value: Área 1; align: center; color: Red"
-              area-button-handler>
-            </a-entity>
-
-            <a-entity id="area2" class="clickable area-button" geometry="primitive: plane; width: 0.5; height: 0.5"
-              material="color: Yellow" position="0.75 0 0" text="value: Área 2; align: center; color: Green"
-              area-button-handler>
-            </a-entity>
+            {Object.keys(infoData.area).map((key, index) => (
+              <a-entity key={key} class="clickable" 
+                id={key}
+                button-handler={`area: ${key}; type: area`}
+                geometry="primitive: plane; width: 0.5; height: 0.3"
+                material="color: black; opacity: 0.5"
+                position={`${index * 1.5} 0 0`}
+                text={`value: ${infoData.area[key].description}; align: center; color: white; font: mozillavr;`}>
+              </a-entity>
+            ))}
           </a-entity>
 
-          {/* Botones interactivos para mostrar el panel de información */}
-          <a-entity id="panelButtons" position="0 3.5 -1.5">
-            <a-entity id="panel1" class="clickable panel-button" geometry="primitive: plane; width: 0.5; height: 0.5"
-              material="color: Red" position="-0.5 0 0" text="value: Ver Panel; align: center; color: White"
-              panel-button-handler>
-            </a-entity>
+          {/* Botones interactivos para mostrar información */}
+          <a-entity id="infoButtons" position="0 3.5 -2.5">
+            {Object.keys(infoData.info).map((key, index) => (
+              <a-entity key={key} class="clickable" 
+                id={key}
+                button-handler={`area: ${key}; type: info`}
+                geometry="primitive: plane; width: 0.5; height: 0.3"
+                material="color: black; opacity: 0.5"
+                position={`${index * 1.5} 0 0`}
+                text={`value: ${infoData.info[key].description}; align: center; color: white; font: mozillavr;`}>
+              </a-entity>
+            ))}
           </a-entity>
 
           {/* Panel de información si existe */}
           {currentPanel && (
-            <>
-              {/* Panel con esquinas redondeadas y transparencia */}
-              <a-entity id="roundedPanel" position="0 3.5 -1.2" geometry="primitive: plane; width: 3.0; height: 1.5;"
-                material="color: #333; opacity: 0.5" radius="3">
-                
-                {/* Texto (lado izquierdo) */}
-                <a-entity id="infoPanelText" position="-0.75 0 0.1" geometry="primitive: plane; width: 1.0; height: 1.0"
-                  material="color: transparent" text={`value: ${currentPanel.description}; color: #FFF; wrapCount: 30;`}>
+            <a-entity id="infoPanel" position="0 2 -2" geometry="primitive: plane; width: 3.0; height: 1.5;"
+              material="color: #333; opacity: 0.5" text={`value: ${currentPanel.description}; color: white; wrapCount: 30;`}>
+              {currentPanel.panelImage && (
+                <a-entity id="panelImage" position="1 0 0.1" geometry="primitive: plane; width: 1.0; height: 1.0"
+                  material={`src: ${currentPanel.panelImage}; color: white`}>
                 </a-entity>
-
-                {/* Imagen (lado derecho) */}
-                {currentPanel.hasPanelImage && (
-                  <a-entity id="infoPanelImage" position="1 0 0.1" geometry="primitive: plane; width: 1.0; height: 1.0"
-                    material={`src: ${currentPanel.panelImage}; color: #FFF`}>
-                  </a-entity>
-                )}
-              </a-entity>
-            </>
+              )}
+            </a-entity>
           )}
         </a-scene>
       ) : (

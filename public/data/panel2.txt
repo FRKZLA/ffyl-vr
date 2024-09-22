@@ -1,0 +1,6 @@
+Este texto
+contiene renglones
+	tabuladores y texto que excede tamaño
+	para probar si es posible
+			almacenar esta información
+			o mostrarla correctamente en un espacio confinado, de manera que se pueda extender
