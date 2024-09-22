@@ -24,10 +24,14 @@ export default function Home() {
         <style>{`
           .a-enter-vr-button {
             position: fixed !important;
-            top: 10px !important;
-            right: 10px !important;
+            bottom: 25px !important;
+            right: 25px !important;
             z-index: 9999 !important;
             visibility: visible !important;
+            width: 105px !important;
+            height: 70px !important;
+            background-color: rgba(0, 0, 0, 0.5) !important; /* Fondo más visible */
+            color: white !important; /* Texto visible */
           }
         `}</style>
       </Head>
@@ -56,9 +60,9 @@ export default function Home() {
           {/* Botón interactivo para cambiar la escena */}
           <a-entity
             class="clickable"
-            geometry="primitive: plane; width: 1; height: 0.5"
+            geometry="primitive: plane; width: 1.5; height: 0.7" 
             material="color: #333"
-            position="0 3.2 -2"
+            position="0 1.5 -3"  
             text="value: Oficina; align: center; color: #FFF"
             event-set__mouseenter="material.color: #7BC8A4"
             event-set__mouseleave="material.color: #333"
