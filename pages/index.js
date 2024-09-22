@@ -20,9 +20,18 @@ export default function Home() {
       <Head>
         <title>FFyL 360°</title>
         <meta name="description" content="FFyL 360°" />
-        {/* Agregar estilos para forzar la visibilidad del botón VR */}
+        {/* Agregar estilos para forzar la visibilidad del botón VR y AR, y eliminar las scrollbars */}
         <style>{`
-          .a-enter-vr-button {
+          html, body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden; /* Elimina scrollbars */
+            height: 100%; /* Asegura que ocupe el 100% del alto */
+          }
+          #__next {
+            height: 100%; /* Asegura que ocupe el 100% del alto */
+          }
+          .a-enter-vr-button, .a-enter-ar-button { /* Asegura que los botones AR y VR tengan el mismo estilo */
             position: fixed !important;
             bottom: 25px !important;
             right: 25px !important;
@@ -30,8 +39,11 @@ export default function Home() {
             visibility: visible !important;
             width: 105px !important;
             height: 70px !important;
-            background-color: rgba(0, 0, 0, 0.5) !important; /* Fondo más visible */
-            color: white !important; /* Texto visible */
+            background-color: rgba(0, 0, 0, 0.5) !important;
+            color: white !important;
+            border: none !important;
+            font-size: 14px !important;
+            border-radius: 10px !important;
           }
         `}</style>
       </Head>
@@ -69,9 +81,6 @@ export default function Home() {
             onclick={changeScene}
           ></a-entity>
 
-          {/* Luces para mejorar la visibilidad */}
-          <a-light type="ambient" color="#ffffff"></a-light>
-          <a-light type="directional" position="-1 1 0" intensity="1"></a-light>
         </a-scene>
       ) : (
         <p>Cargando VR...</p>
