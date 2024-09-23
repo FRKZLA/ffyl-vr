@@ -1,11 +1,33 @@
 {
   "area": {
-    "hallway": {
-      "image": "/image/Hallway.jpg",
+    "hallwayA": {
+      "image": "/image/HallwayA.jpg",
+      "areRot": "0 270 0",
       "description": "A long, dark hallway."
+    },
+    "hallwayB": {
+      "image": "/image/HallwayB.jpg",
+      "areRot": "0 150 0",
+      "description": "A small, cluttered office."
+    },
+    "hallwayC": {
+      "image": "/image/HallwayC.jpg",
+      "areRot": "0 150 0",
+      "description": "A small, cluttered office."
     },
     "office": {
       "image": "/image/Office.jpg",
+      "areRot": "0 150 0",
+      "description": "A small, cluttered office."
+    },
+    "lab": {
+      "image": "/image/Lab.jpg",
+      "areRot": "0 150 0",
+      "description": "A small, cluttered office."
+    },
+    "studio": {
+      "image": "/image/Studio.jpg",
+      "areRot": "0 150 0",
       "description": "A small, cluttered office."
     }
   },
