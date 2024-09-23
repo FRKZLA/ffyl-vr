@@ -12,13 +12,19 @@
   "info": {
     "punto 1": {
       "image": false,
-      "description": "Punto información, Texto de información.",
+      "description": "información: Texto de información.\\neste es un renglón nuevo\\n\\neste es otro parrafo, esperando que quepa completo xd\\n\\nFunciona textoooooooo textoooooooo textoooooooo \\npor favor...\\n\\ni e s\\n\\n queeeeeee mas se- ... textoooooooo textoooooooo",
       "panel": true,
+      "panWidth": 2,
+      "panHeight": 2,
+      "cloPos":1,
       "panelImage": false
     },
     "pintura A": {
       "panel": true,
-      "description": "pintura A, con texto de prueba.",
+      "panWidth": 2,
+      "panHeight": 1,
+      "cloPos":0.5,
+      "description": "pintura A.\\n\\n con texto de prueba.",
       "panelImage": "/data/panel1.png"
     },
     "pintura B": {

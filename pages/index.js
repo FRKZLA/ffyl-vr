@@ -22,8 +22,11 @@ export default function Home({ infoData }) {
   const [isMobileOrVR, setIsMobileOrVR] = useState(false);
   const [currentArea, setCurrentArea] = useState('hallway'); // Área inicial
   const [currentPanel, setCurrentPanel] = useState(null); // Panel inicial
+  const [panWidth, setpanWidth] = useState(null); // Panel anchura
+  const [panHeight, setpanHeight] = useState(null); // Panel altura
+  const [cloPos, setcloPos] = useState(null); // altura botón cerrar
+  const [panelPosition, setPanelPosition] = useState({ x: 0, y: 0, z: -2 }); // Posición del panel
   const [fuseActive, setFuseActive] = useState(false); // Estado para controlar el fuse
-  const [panelExpanded, setPanelExpanded] = useState(false); // Controla si el panel está abierto
 
   useEffect(() => {
     setIsClient(true); // Asegura que el componente se renderice solo en el cliente
@@ -41,7 +44,7 @@ export default function Home({ infoData }) {
       AFRAME.registerComponent('button-handler', {
         schema: {
           area: { type: 'string' }, // Recibe el área o información
-          type: { type: 'string' }, // Puede ser "area" o "info"
+          type: { type: 'string' }, // Puede ser "area", "info" o "close"
         },
         init: function () {
           const el = this.el;
@@ -58,7 +61,7 @@ export default function Home({ infoData }) {
                 setCurrentPanel(null); // Cierra el panel
               } else if (data.type === 'info') {
                 setCurrentPanel(infoData.info[data.area]); // Muestra el panel de información
-                setPanelExpanded(true); // Expande el panel
+                setPanelPosition(el.object3D.position); // Toma la posición del botón
               } else if (data.type === 'close') {
                 setCurrentPanel(null); // Cierra el panel cuando se hace clic en el botón de cerrar
               }
@@ -81,7 +84,6 @@ export default function Home({ infoData }) {
           const camera = document.querySelector('[camera]');
           if (camera) {
             const cameraPosition = camera.object3D.position;
-            const elPosition = this.el.object3D.position;
             this.el.object3D.lookAt(cameraPosition);
           }
         }
@@ -172,41 +174,44 @@ export default function Home({ infoData }) {
             <a-entity id="punto1" class="clickable" 
               button-handler={`area: punto 1; type: info`}
               geometry="primitive: plane; width: 0.5; height: 0.3"
+              scale="2 2 2"
               material="color: black; opacity: 0.5"
               position="0 2.0 -2.5" // Manualmente ajustado
-              text="value: Información 1; align: center; color: white"
+              text="value: info; align: center; color: white; width: 2"
               face-camera>
             </a-entity>
 
             <a-entity id="pinturaA" class="clickable" 
               button-handler={`area: pintura A; type: info`}
               geometry="primitive: plane; width: 0.5; height: 0.3"
+              scale="2 2 2"
               material="color: black; opacity: 0.5"
               position="1.5 2.0 -2.5" // Manualmente ajustado
-              text="value: Pintura A; align: center; color: white"
+              text="value: Pintura A; align: center; color: white; width: 2"
               face-camera>
             </a-entity>
           </a-entity>
-
-          {/* Panel de información */}
+          {/* Panel de información con la posición dinámica */}
           {currentPanel && (
-            <a-entity id="infoPanel" position="0 2 -2" geometry="primitive: plane; width: 3.0; height: 1.5;"
+            <a-entity id="infoPanel" position={`${panelPosition.x} ${panelPosition.y} ${panelPosition.z + 0.8}`} 
+              geometry={`primitive: plane; width: ${currentPanel.panWidth}; height: ${currentPanel.panHeight};`}
               material="color: #333; opacity: 0.5" 
-              text={`value: ${currentPanel.description}; color: white; wrapCount: 30;`}
-              face-camera
-              close-on-look-away>
+              text={`value: ${currentPanel.description}; color: white; align: left; anchor: center; wrapCount: 30; width: 1.5; xOffset: -.2; zOffset: 0.005;`}
+              face-camera>
               
+              {/* Mostrar imagen si existe */}
               {currentPanel.panelImage && (
-                <a-entity id="panelImage" position="1 0 0.1" geometry="primitive: plane; width: 1.0; height: 1.0"
+                <a-entity id="panelImage" position="1.5 0 0.1" geometry="primitive: plane; width: 1.0; height: 1.0"
                   material={`src: ${currentPanel.panelImage}; color: white`}>
                 </a-entity>
               )}
 
               {/* Botón de cerrar en la esquina superior derecha */}
-              <a-entity id="closeButton" geometry="primitive: plane; width: 0.2; height: 0.2"
+              <a-entity id="closeButton" geometry="primitive: circle; width: 0.5; height: 0.5"
                 material="color: red; opacity: 0.8" 
-                position="1.4 0.6 0.1"
-                text="value: X; color: white; align: center"
+                scale=".1 .1 .1"
+                position={`-1 ${currentPanel.cloPos} 0.01`}
+                text="value: X; color: white; align: center; width: 25; zOffset: 0.005;"
                 class="clickable"
                 button-handler={`area: close; type: close`}>
               </a-entity>
