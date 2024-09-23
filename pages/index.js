@@ -22,9 +22,6 @@ export default function Home({ infoData }) {
   const [isMobileOrVR, setIsMobileOrVR] = useState(false);
   const [currentArea, setCurrentArea] = useState('hallway'); // Área inicial
   const [currentPanel, setCurrentPanel] = useState(null); // Panel inicial
-  const [panWidth, setpanWidth] = useState(null); // Panel anchura
-  const [panHeight, setpanHeight] = useState(null); // Panel altura
-  const [cloPos, setcloPos] = useState(null); // altura botón cerrar
   const [panelPosition, setPanelPosition] = useState({ x: 0, y: 0, z: -2 }); // Posición del panel
   const [fuseActive, setFuseActive] = useState(false); // Estado para controlar el fuse
 
@@ -62,8 +59,18 @@ export default function Home({ infoData }) {
               } else if (data.type === 'info') {
                 setCurrentPanel(infoData.info[data.area]); // Muestra el panel de información
                 setPanelPosition(el.object3D.position); // Toma la posición del botón
+                // Ocultar botones mientras el panel esté abierto y deshabilitar clics
+                document.getElementById('areaButtons').setAttribute('visible', 'false');
+                document.getElementById('infoButtons').setAttribute('visible', 'false');
+                document.getElementById('areaButtons').classList.remove('clickable');
+                document.getElementById('infoButtons').classList.remove('clickable');
               } else if (data.type === 'close') {
                 setCurrentPanel(null); // Cierra el panel cuando se hace clic en el botón de cerrar
+                // Mostrar los botones de nuevo cuando el panel se cierra y habilitar clics
+                document.getElementById('areaButtons').setAttribute('visible', 'true');
+                document.getElementById('infoButtons').setAttribute('visible', 'true');
+                document.getElementById('areaButtons').classList.add('clickable');
+                document.getElementById('infoButtons').classList.add('clickable');
               }
             }, 500); // Retardo de medio segundo
           });
@@ -153,18 +160,20 @@ export default function Home({ infoData }) {
             <a-entity id="hallway" class="clickable" 
               button-handler={`area: hallway; type: area`}
               geometry="primitive: plane; width: 0.5; height: 0.3"
+              scale="2 2 2"
               material="color: black; opacity: 0.5"
               position="0 1.6 -2" // Manualmente ajustado
-              text="value: Hallway; align: center; color: white"
+              text="value: Hallway; align: center; color: white; width: 2"
               face-camera>
             </a-entity>
 
             <a-entity id="office" class="clickable" 
               button-handler={`area: office; type: area`}
               geometry="primitive: plane; width: 0.5; height: 0.3"
+              scale="2 2 2"
               material="color: black; opacity: 0.5"
               position="1.5 1.6 -2" // Manualmente ajustado
-              text="value: Office; align: center; color: white"
+              text="value: Office; align: center; color: white; width: 2"
               face-camera>
             </a-entity>
           </a-entity>
@@ -191,6 +200,7 @@ export default function Home({ infoData }) {
               face-camera>
             </a-entity>
           </a-entity>
+
           {/* Panel de información con la posición dinámica */}
           {currentPanel && (
             <a-entity id="infoPanel" position={`${panelPosition.x} ${panelPosition.y} ${panelPosition.z + 0.8}`} 
